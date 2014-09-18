@@ -42,7 +42,7 @@ fis.config.merge({
             html: "require-async"
         },
 
-        postpackager: ['autoload',  opermanifest],
+        postpackager: ['autoload','simple',  opermanifest],
         spriter: 'csssprites',
         optimizer: {
             tpl: 'html-minifier',
@@ -61,6 +61,11 @@ fis.config.merge({
                 scriptTag:'<!--SCRIPT_PLACEHOLDER-->',
                 styleTag: '<!--STYLE_PLACEHOLDER-->',
                 resourceMapTag:'<!--RESOURCEMAP_PLACEHOLDER-->'
+            }
+            ,
+            simple:{
+                autoCombine:true,
+                autoReflow:true
             }
         }
 
