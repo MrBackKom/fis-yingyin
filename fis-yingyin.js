@@ -16,6 +16,11 @@ fis.config.merge({
                 id : '$1'
             },
             {
+                //设置common模块的图片产出路径
+                reg:/common\/.+?.(jpeg|png|jpg|gif)$/i,
+                release:'images/'+'$&'
+            },
+            {
                 //一级业务模块，可以引用短路径，比如modules/carton/carton.js
                 //直接引用为var carton = require('carton');
                 reg : /^\/modules\/([^\/]+)\/\1\.(js)$/i,
@@ -25,19 +30,31 @@ fis.config.merge({
                 id : '$1'
             },
             {
+                //设置common模块的图片产出路径
+                reg:/modules\/.+?.(jpeg|png|jpg|gif)$/i,
+                release:'images/'+'$&'
+            },
+            {
                 //其他css文件
                 reg : "**.css",
                 //css文件会做csssprite处理
                 useSprite : true
-            }
+            },
+            {
+                reg: '**.tmpl',
+                isJsLike: true,
+                release: false
+            },
         ]
     },
     modules: {
         parser: {
+            tmpl: 'utc',
             css: 'less',
             less: 'less'
         },
         postprocessor: {
+            css:'require-async',
             js: 'jswrapper,require-async',
             html: "require-async"
         },
@@ -45,7 +62,7 @@ fis.config.merge({
         postpackager: ['autoload','simple',  opermanifest],
         spriter: 'csssprites',
         optimizer: {
-            tpl: 'html-minifier',
+            html: 'html-minifier',
         }
     },
     settings: {
@@ -73,7 +90,9 @@ fis.config.merge({
 });
 
 function opermanifest(ret, conf, settings, opt){
-    console.log("opermanifest function called")
+    //console.log("opermanifest function called")
+
+    
 }
 
 
