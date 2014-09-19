@@ -1,7 +1,7 @@
 fis-yingyin
 =========
 
-基于FIS的yingyin-webapp解决方案
+基于FIS的yingyin FE解决方案
 
 ### 使用方法：
 
