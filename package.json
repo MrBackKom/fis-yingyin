@@ -1,6 +1,6 @@
 {
   "name": "fis-yingyin",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "fis-yingyin.js",
   "bin": {
     "yingyin": "bin/yingyin",
