@@ -1,52 +1,11 @@
 var fis = module.exports = require('fis');
+var fs = require('fs');
+var iconv = require('iconv-lite');
 
 fis.cli.name = 'fis-yingyin';
 fis.cli.info = fis.util.readJSON(__dirname + '/package.json');
 
 fis.config.merge({
-    roadmap : {
-        path : [
-            {
-                //一级通用组件组件，可以引用短路径，比如common/searchbox/searchbox.js
-                //直接引用为var searchbox = require('searchbox');
-                reg : /^\/common\/([^\/]+)\/\1\.(js)$/i,
-                //是组件化的，会被jswrapper包装
-                isMod : true,
-                //id为文件夹名
-                id : '$1'
-            },
-            {
-                //设置common模块的图片产出路径
-                reg:/common\/.+?.(jpeg|png|jpg|gif)$/i,
-                release:'images/'+'$&'
-            },
-            {
-                //一级业务模块，可以引用短路径，比如modules/carton/carton.js
-                //直接引用为var carton = require('carton');
-                reg : /^\/modules\/([^\/]+)\/\1\.(js)$/i,
-                //是组件化的，会被jswrapper包装
-                isMod : true,
-                //id为文件夹名
-                id : '$1'
-            },
-            {
-                //设置common模块的图片产出路径
-                reg:/modules\/.+?.(jpeg|png|jpg|gif)$/i,
-                release:'images/'+'$&'
-            },
-            {
-                //其他css文件
-                reg : "**.css",
-                //css文件会做csssprite处理
-                useSprite : true
-            },
-            {
-                reg: '**.tmpl',
-                isJsLike: true,
-                release: false
-            },
-        ]
-    },
     modules: {
         parser: {
             tmpl: 'utc',
@@ -62,7 +21,7 @@ fis.config.merge({
         postpackager: ['autoload','simple',  opermanifest],
         spriter: 'csssprites',
         optimizer: {
-            html: 'html-minifier',
+            html: 'html-minifier'
         }
     },
     settings: {
@@ -90,9 +49,47 @@ fis.config.merge({
 });
 
 function opermanifest(ret, conf, settings, opt){
-    //console.log("opermanifest function called")
 
-    
+    var manifestfile = './app.manifest';
+    var version = new Date().getTime();
+
+    var manifesthead = "CACHE MANIFEST";
+    var manifestversion ="\r\n\r\n#"+ version;
+    var manifestcache ="";//"\r\n\r\nCACHE:";
+    if(ret.map && ret.map.pkg){
+        for(pkg in ret.map.pkg){
+            var _temppath = '\r\n' + ret.map.pkg[pkg]["uri"];
+            manifestcache += _temppath;
+        }
+    }
+    if(ret.map && ret.map.res){
+        for(res in ret.map.res){
+            var _temppath = '\r\n' + ret.map.res[res]["uri"];
+            manifestcache += _temppath;
+        }
+    }
+
+
+    var network = '\r\n' + 'NETWORK:';
+    network +='\r\n*'
+
+
+
+    var manifestcontent = manifesthead + manifestversion + manifestcache + network;
+    var arr = iconv.encode(manifestcontent, 'utf-8');
+
+
+    // appendFile，如果文件不存在，会自动创建新文件
+    // 如果用writeFile，那么会删除旧文件，直接写新文件
+    fs.writeFile(manifestfile, arr, function(err){
+        if(err)
+            console.log("fail " + err);
+        else
+            console.log("manifest updated");
+    });
+    var file = fis.file(fis.project.getProjectPath(), '/app.manifest');
+                 ret.pkg[file.subpath] = file;
+                 //file.setContent(content);
 }
 
 
